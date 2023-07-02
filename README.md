@@ -4,25 +4,28 @@ This is a Chrome extension that tracks the duration of your Google Meet meetings
 
 ## Installation
 
-### Installing from the .crx file
+~~### Installing from the .crx file~~
 
-1. **Download the .crx file**: Download the `.crx` file from the repository.
+~~1. **Download the .crx file**: Download the `.crx` file from the repository.~~
 
-2. **Install the extension into Chrome**:
+~~2. **Install the extension into Chrome**:~~
 
-   - Open Chrome and navigate to `chrome://extensions`.
-   - Enable Developer mode by clicking the toggle switch in the top right corner.
-   - Drag and drop the `.crx` file into the Chrome extensions page. You should now see your extension in the list.
+   ~~- Open Chrome and navigate to `chrome://extensions`.~~
+   ~~- Enable Developer mode by clicking the toggle switch in the top right corner.~~
+   ~~- Drag and drop the `.crx` file into the Chrome extensions page. You should now see your extension in the list.~~
 
-3. **Pin the extension**:
+~~3. **Pin the extension**:~~
 
-   - In the Chrome toolbar, click on the Extensions button (it looks like a puzzle piece).
-   - Find your extension in the dropdown list and click the pin icon next to it. This will add the extension's icon to the toolbar.
+   ~~- In the Chrome toolbar, click on the Extensions button (it looks like a puzzle piece).~~
+   ~~- Find your extension in the dropdown list and click the pin icon next to it. This will add the extension's icon to the toolbar.~~
 
-4. **Use the extension**:
+~~4. **Test the extension**:~~
 
-   - Open a Google Meet meeting in a new tab. The extension should automatically track the duration of the meeting.
-   - After the meeting, click on the extension's icon in the toolbar to view the meeting times in the popup.
+   ~~- Open a Google Meet meeting in a new tab. The extension should automatically track the duration of the meeting.~~
+   ~~- After the meeting, click on the extension's icon in the toolbar to view the meeting times in the popup.~~
+
+As of Chrome 91, Google has disabled the ability to install non-web store extensions or CRX files. To allow installation I need to publish it to the Chrome Web Store. It costs 5 bux and I can't be bothered yet.
+
 
 ### Installing in developer mode
 
