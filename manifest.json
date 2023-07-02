@@ -13,5 +13,11 @@
       "48": "images/favicon-32x32.png",
       "128": "images/android-chrome-192x192.png"
     }
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["popup.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
