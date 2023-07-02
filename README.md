@@ -4,7 +4,27 @@ This is a Chrome extension that tracks the duration of your Google Meet meetings
 
 ## Installation
 
-To install the extension in developer mode, follow these steps:
+### Installing from the .crx file
+
+1. **Download the .crx file**: Download the `.crx` file from the repository.
+
+2. **Install the extension into Chrome**:
+
+   - Open Chrome and navigate to `chrome://extensions`.
+   - Enable Developer mode by clicking the toggle switch in the top right corner.
+   - Drag and drop the `.crx` file into the Chrome extensions page. You should now see your extension in the list.
+
+3. **Pin the extension**:
+
+   - In the Chrome toolbar, click on the Extensions button (it looks like a puzzle piece).
+   - Find your extension in the dropdown list and click the pin icon next to it. This will add the extension's icon to the toolbar.
+
+4. **Use the extension**:
+
+   - Open a Google Meet meeting in a new tab. The extension should automatically track the duration of the meeting.
+   - After the meeting, click on the extension's icon in the toolbar to view the meeting times in the popup.
+
+### Installing in developer mode
 
 1. **Clone the repository**: Clone this repository to your local machine using `git clone`.
 
