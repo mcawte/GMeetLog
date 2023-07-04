@@ -3,7 +3,6 @@
   "name": "Google Meet Tracker",
   "version": "1.0",
   "description": "A Chrome extension that tracks the duration of your Google Meet meetings.",
-  "default_locale": "en",
   "icons": {
     "16": "images/favicon-16x16.png",
     "48": "images/favicon-32x32.png",
