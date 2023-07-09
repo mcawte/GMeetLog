@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Google Meet Tracker",
-  "version": "1.0",
+  "version": "1.1",
   "description": "A Chrome extension that tracks the duration of your Google Meet meetings.",
   "icons": {
     "16": "images/favicon-16x16.png",
