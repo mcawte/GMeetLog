@@ -123,5 +123,87 @@ function deleteMeeting(meetingToDelete: MeetingDetails) {
   });
 }
 
-// call updateData on page load:
-document.addEventListener("DOMContentLoaded", updateData);
+function formatDuration(duration: number) {
+  const hours = Math.floor(duration / (60 * 60 * 1000));
+  const minutes = Math.floor((duration % (60 * 60 * 1000)) / (60 * 1000));
+  const seconds = Math.floor((duration % (60 * 1000)) / 1000);
+
+  return `${hours} hours ${minutes} minutes ${seconds} seconds`;
+}
+
+function exportData(format: "csv" | "json") {
+  // Retrieve the meeting data
+  chrome.storage.sync.get("meetingData", function (data) {
+    const meetings = data.meetingData as MeetingData | undefined;
+    if (!meetings) return;
+
+    let dataStr, mimeType, fileExtension;
+
+    // Convert the data to CSV or JSON format
+    if (format === "csv") {
+      dataStr = convertDataToCSV(meetings);
+      mimeType = "text/csv";
+      fileExtension = "csv";
+    } else {
+      // json
+      dataStr = convertDataToJSON(meetings);
+      mimeType = "application/json";
+      fileExtension = "json";
+    }
+
+    const dataBlob = new Blob([dataStr], { type: mimeType });
+
+    // Create a download link for the data and simulate a click
+    const url = window.URL.createObjectURL(dataBlob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = `data.${fileExtension}`;
+    downloadLink.click();
+
+    // Revoke the URL to free up memory
+    window.URL.revokeObjectURL(url);
+  });
+}
+
+// Convert meeting data to CSV format
+function convertDataToCSV(meetings: MeetingData): string {
+  let csvStr = "URL,Start Time,End Time,Duration,Participants\n"; // CSV header
+
+  for (const url in meetings) {
+    for (const meeting of meetings[url]) {
+      let durationStr = formatDuration(meeting.duration);
+      csvStr += `${url},${meeting.startTime},${
+        meeting.endTime
+      },"${durationStr}","${meeting.participants.join(", ")}"\n`;
+    }
+  }
+
+  return csvStr;
+}
+
+// Convert meeting data to JSON format
+function convertDataToJSON(meetings: MeetingData): string {
+  return JSON.stringify(meetings, null, 2);
+}
+
+// Get things running on page load
+document.addEventListener("DOMContentLoaded", function () {
+  const exportSelect = document.getElementById(
+    "exportSelect"
+  ) as HTMLSelectElement;
+  const exportButton = document.getElementById(
+    "exportButton"
+  ) as HTMLButtonElement;
+
+  exportButton.addEventListener("click", function () {
+    const format = exportSelect.value;
+    if (format === "csv" || format === "json") {
+      exportData(format);
+    } else {
+      console.error(`Unexpected export format: ${format}`);
+    }
+  });
+
+  // Call updateData function to load the meetings when the popup is opened:
+  updateData();
+});
