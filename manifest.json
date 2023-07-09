@@ -20,10 +20,17 @@
     }
   },
   "permissions": ["tabs", "storage"],
+  "host_permissions": ["https://meet.google.com/*"],
   "web_accessible_resources": [
     {
-      "resources": ["popup.js"],
+      "resources": ["dist/popup.js"],
       "matches": ["<all_urls>"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://meet.google.com/*"],
+      "js": ["dist/content.js"]
     }
   ]
 }
