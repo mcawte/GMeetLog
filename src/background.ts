@@ -85,6 +85,8 @@ function endMeeting(tabId: number) {
 
     // Save the updated meeting data
     chrome.storage.sync.set({ meetingData }, () => {});
+    // Let popup know to refresh data
+    chrome.runtime.sendMessage({action: "updateData"});
   });
 
   delete currentMeetings[tabId];
