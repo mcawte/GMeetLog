@@ -3,6 +3,7 @@ interface Meeting {
   url: string;
   startTime: string;
   endTime?: string;
+  participants?: string[];
 }
 
 let currentMeeting: Meeting | null = null;
@@ -35,11 +36,9 @@ function handleUrlChange(tabId: number, url: string) {
     }
     // Start a new meeting
     startMeeting(tabId, url);
-  } else {
-    // If the URL is not a Google Meet meeting URL and there's a current meeting, end it
-    if (currentMeeting) {
-      endMeeting(currentMeeting);
-    }
+  } else if (currentMeeting && currentMeeting.tabId === tabId) {
+    // If the URL is not a Google Meet meeting URL and there's a current meeting with the same tabId, end it
+    endMeeting(currentMeeting);
   }
 }
 
@@ -48,6 +47,7 @@ function startMeeting(tabId: number, url: string) {
     tabId,
     url,
     startTime: new Date().toISOString(),
+    participants: [],
   };
 }
 
@@ -55,18 +55,33 @@ function endMeeting(meeting: Meeting) {
   meeting.endTime = new Date().toISOString();
   let duration =
     new Date(meeting.endTime).getTime() - new Date(meeting.startTime).getTime();
-  // Store the meeting details
-  chrome.storage.sync.set(
-    {
-      [meeting.url]: {
-        duration,
-        startTime: meeting.startTime,
-        endTime: meeting.endTime,
-      },
-    },
-    () => {
-      console.log("Meeting details saved");
-    }
-  );
+
+  // Retrieve all the existing meeting data
+  chrome.storage.sync.get(["meetingData"], (result) => {
+    let meetingData = result.meetingData || {};
+
+    // Add the new meeting to the meeting data
+    meetingData[meeting.url] = {
+      duration,
+      startTime: meeting.startTime,
+      endTime: meeting.endTime,
+      participants: meeting.participants,
+    };
+
+    // Save the updated meeting data
+    chrome.storage.sync.set({ meetingData }, () => {});
+  });
+
   currentMeeting = null;
 }
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "getParticipants" && sender.tab) {
+    if (currentMeeting && currentMeeting.tabId === sender.tab.id) {
+      // Remove duplicates using Set and spread operator
+      currentMeeting.participants = [
+        ...new Set([...(currentMeeting.participants || []), ...request.source]),
+      ];
+    }
+  }
+});
