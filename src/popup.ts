@@ -45,7 +45,7 @@ function displayData(meetings: MeetingData) {
       );
 
       for (const meeting of meetingList) {
-        const listItem = document.createElement("li");
+        const listItem = document.createElement("div");
         listItem.className = "meeting";
 
         const title = document.createElement("h2");
@@ -74,6 +74,15 @@ function displayData(meetings: MeetingData) {
         )}`;
         listItem.appendChild(participants);
 
+        // Add a delete button
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Remove";
+        deleteButton.addEventListener("click", function () {
+          // remove the meeting from storage
+          deleteMeeting(meeting);
+        });
+        listItem.appendChild(deleteButton);
+
         meetingsElement.appendChild(listItem);
       }
     }
@@ -93,6 +102,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     updateData();
   }
 });
+
+function deleteMeeting(meetingToDelete: MeetingDetails) {
+  chrome.storage.sync.get("meetingData", function (data) {
+    const meetings = data.meetingData as MeetingData | undefined;
+    if (!meetings) return;
+
+    // loop through each meeting URL and remove the meeting to delete
+    for (const url in meetings) {
+      meetings[url] = meetings[url].filter(
+        (meeting) => meeting.startTime !== meetingToDelete.startTime
+      );
+    }
+
+    // save the updated meeting data back to storage
+    chrome.storage.sync.set({ meetingData: meetings }, function () {
+      // once the data is saved, update the displayed data
+      updateData();
+    });
+  });
+}
 
 // call updateData on page load:
 document.addEventListener("DOMContentLoaded", updateData);
