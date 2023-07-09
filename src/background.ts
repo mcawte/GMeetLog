@@ -84,4 +84,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       ];
     }
   }
+  if (request.action === "endMeeting" && sender.tab) {
+    if (currentMeeting && currentMeeting.tabId === sender.tab.id) {
+      endMeeting(currentMeeting);
+    }
+  }
 });
