@@ -12,15 +12,31 @@ document.addEventListener("DOMContentLoaded", function () {
       };
     }) {
       const meetings = data.meetingData;
+      // Convert the data object to an array of meetings
+      if (!meetings) return;
+      const sortedMeetings = Object.entries(meetings).map(([url, details]) => ({
+        url,
+        ...details,
+      }));
+
+      // Sort the meetings by start time in descending order
+      sortedMeetings.sort(
+        (a, b) =>
+          new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+      );
+
+      // Get meetings element in doc
       const meetingsElement = document.getElementById("meetings");
-      if (meetingsElement && meetings) {
-        for (const url in meetings) {
-          const meeting = meetings[url];
+
+      if (meetingsElement && sortedMeetings) {
+        for (const index in sortedMeetings) {
+          const meeting = sortedMeetings[index];
+
           const listItem = document.createElement("li");
           listItem.className = "meeting";
 
           const title = document.createElement("h2");
-          title.textContent = url;
+          title.textContent = meeting.url;
           listItem.appendChild(title);
 
           const duration = document.createElement("p");
