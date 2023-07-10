@@ -25,8 +25,9 @@ chrome.tabs.onRemoved.addListener(
 );
 
 function handleUrlChange(tabId: number, url: string) {
-  // Regular expression to match Google Meet meeting URLs
-  const googleMeetUrlPattern = /^https:\/\/meet\.google\.com\/[a-z\-]+$/;
+  // Regular expression to match Google Meet meeting URLs.
+  // Allows trailing query params but not paths
+  const googleMeetUrlPattern = /^https:\/\/meet\.google\.com\/[a-z\-]+(\?.*)?$/;
 
   // If the URL is a Google Meet meeting URL
   if (googleMeetUrlPattern.test(url)) {
@@ -86,7 +87,7 @@ function endMeeting(tabId: number) {
     // Save the updated meeting data
     chrome.storage.sync.set({ meetingData }, () => {});
     // Let popup know to refresh data
-    chrome.runtime.sendMessage({action: "updateData"});
+    chrome.runtime.sendMessage({ action: "updateData" });
   });
 
   delete currentMeetings[tabId];
