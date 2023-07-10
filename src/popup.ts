@@ -1,6 +1,8 @@
 import { updateData, exportData } from "./dataHandler";
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+let port = chrome.runtime.connect({ name: "popup" });
+
+port.onMessage.addListener((request) => {
   if (request.action === "updateData") {
     updateData();
   }

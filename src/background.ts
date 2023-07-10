@@ -6,7 +6,7 @@ interface Meeting {
   participants?: string[];
 }
 
-let currentMeetings: { [key: number]: Meeting } = {};
+export let currentMeetings: { [key: number]: Meeting } = {};
 
 // Listen for tab updates
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -24,7 +24,19 @@ chrome.tabs.onRemoved.addListener(
   }
 );
 
-function handleUrlChange(tabId: number, url: string) {
+// This encodes whether popup is active
+let popupPort: chrome.runtime.Port | null = null;
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "popup") {
+    popupPort = port;
+    port.onDisconnect.addListener(() => {
+      popupPort = null;
+    });
+  }
+});
+
+export function handleUrlChange(tabId: number, url: string) {
   // Regular expression to match Google Meet meeting URLs.
   // Allows trailing query params but not paths
   const googleMeetUrlPattern = /^https:\/\/meet\.google\.com\/[a-z\-]+(\?.*)?$/;
@@ -43,7 +55,7 @@ function handleUrlChange(tabId: number, url: string) {
   }
 }
 
-function startMeeting(tabId: number, url: string) {
+export function startMeeting(tabId: number, url: string) {
   currentMeetings[tabId] = {
     tabId,
     url,
@@ -52,7 +64,7 @@ function startMeeting(tabId: number, url: string) {
   };
 }
 
-function endMeeting(tabId: number) {
+export function endMeeting(tabId: number) {
   let meeting = currentMeetings[tabId];
   if (!meeting) return;
 
@@ -87,19 +99,17 @@ function endMeeting(tabId: number) {
     // Save the updated meeting data
     chrome.storage.sync.set({ meetingData }, () => {});
     // Let popup know to refresh data
-    chrome.runtime.sendMessage({ action: "updateData" });
+    if (popupPort) {
+      popupPort.postMessage({ action: "updateData" });
+    }
   });
 
   delete currentMeetings[tabId];
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (!sender?.tab?.id) {
-    return;
-  }
-
-  const tabId = sender.tab.id;
-  const meeting = currentMeetings[tabId];
+  const tabId = sender?.tab?.id;
+  const meeting = tabId && currentMeetings[tabId];
 
   if (request.action === "getParticipants") {
     if (meeting) {
