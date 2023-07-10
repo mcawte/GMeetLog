@@ -62,6 +62,7 @@ if (match) {
                   chrome.runtime.sendMessage({
                     action: "endMeeting",
                   });
+                  observer.disconnect(); // Stop observing when the meeting ends
                   return; // Stop searching through mutations after found
                 }
               }
