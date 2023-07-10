@@ -6,7 +6,7 @@ interface Meeting {
   participants?: string[];
 }
 
-let currentMeetings: { [key: number]: Meeting } = {};
+export let currentMeetings: { [key: number]: Meeting } = {};
 
 // Listen for tab updates
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -36,7 +36,7 @@ chrome.runtime.onConnect.addListener((port) => {
   }
 });
 
-function handleUrlChange(tabId: number, url: string) {
+export function handleUrlChange(tabId: number, url: string) {
   // Regular expression to match Google Meet meeting URLs.
   // Allows trailing query params but not paths
   const googleMeetUrlPattern = /^https:\/\/meet\.google\.com\/[a-z\-]+(\?.*)?$/;
@@ -55,7 +55,7 @@ function handleUrlChange(tabId: number, url: string) {
   }
 }
 
-function startMeeting(tabId: number, url: string) {
+export function startMeeting(tabId: number, url: string) {
   currentMeetings[tabId] = {
     tabId,
     url,
@@ -64,7 +64,7 @@ function startMeeting(tabId: number, url: string) {
   };
 }
 
-function endMeeting(tabId: number) {
+export function endMeeting(tabId: number) {
   let meeting = currentMeetings[tabId];
   if (!meeting) return;
 
