@@ -30,6 +30,14 @@
   </head>
   <body>
     <h1>Google Meet Times</h1>
+    <div id="exportControls">
+      <label for="exportSelect">Data Format:</label>
+      <select id="exportSelect">
+        <option value="csv">CSV</option>
+        <option value="json">JSON</option>
+      </select>
+      <button id="exportButton">Export</button>
+    </div>
     <ul id="meetings"></ul>
     <script src="dist/popup.js"></script>
   </body>

@@ -22,6 +22,7 @@ yarn-error.log*
 
 # Cache directories
 .cache/
+.parcel-cache/
 
 
 # Package manager lock files
