@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "parcel build src/background.ts src/content.ts src/popup.ts --dist-dir dist"
+    "build": "parcel build src/background.ts src/content.ts src/popup.ts --dist-dir dist",
+    "dev": "parcel  src/background.ts src/content.ts src/popup.ts --dist-dir dist"
   },
   "keywords": [],
   "author": "",
