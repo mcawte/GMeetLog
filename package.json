@@ -2,16 +2,17 @@
   "name": "gmeet-extension",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "parcel build src/background.ts src/content.ts src/popup.ts --dist-dir dist"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@parcel/config-webextension": "^2.9.3",
     "@types/chrome": "^0.0.239",
+    "parcel": "^2.9.3",
     "typescript": "^5.1.6"
   }
 }
