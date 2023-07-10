@@ -24,6 +24,18 @@ chrome.tabs.onRemoved.addListener(
   }
 );
 
+// This encodes whether popup is active
+let popupPort: chrome.runtime.Port | null = null;
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "popup") {
+    popupPort = port;
+    port.onDisconnect.addListener(() => {
+      popupPort = null;
+    });
+  }
+});
+
 function handleUrlChange(tabId: number, url: string) {
   // Regular expression to match Google Meet meeting URLs.
   // Allows trailing query params but not paths
@@ -87,19 +99,17 @@ function endMeeting(tabId: number) {
     // Save the updated meeting data
     chrome.storage.sync.set({ meetingData }, () => {});
     // Let popup know to refresh data
-    chrome.runtime.sendMessage({ action: "updateData" });
+    if (popupPort) {
+      popupPort.postMessage({ action: "updateData" });
+    }
   });
 
   delete currentMeetings[tabId];
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (!sender?.tab?.id) {
-    return;
-  }
-
-  const tabId = sender.tab.id;
-  const meeting = currentMeetings[tabId];
+  const tabId = sender?.tab?.id;
+  const meeting = tabId && currentMeetings[tabId];
 
   if (request.action === "getParticipants") {
     if (meeting) {
