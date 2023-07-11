@@ -14,6 +14,9 @@
     },
     {
       "staticPath": "manifest.json"
+    },
+    {
+      "staticPath": "popup.html"
     }
   ],
   "keywords": [],

@@ -9,7 +9,7 @@
     "128": "images/android-chrome-192x192.png"
   },
   "background": {
-    "service_worker": "dist/background.js"
+    "service_worker": "background.js"
   },
   "action": {
     "default_popup": "popup.html",
@@ -23,14 +23,14 @@
   "host_permissions": ["https://meet.google.com/*"],
   "web_accessible_resources": [
     {
-      "resources": ["dist/popup.js"],
+      "resources": ["popup.js"],
       "matches": ["<all_urls>"]
     }
   ],
   "content_scripts": [
     {
       "matches": ["https://meet.google.com/*"],
-      "js": ["dist/content.js"]
+      "js": ["content.js"]
     }
   ]
 }
