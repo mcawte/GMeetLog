@@ -1,8 +1,15 @@
+import {
+  MessageData,
+  ParticipantMessageData,
+  TitleMessageData,
+} from "./content";
+
 interface Meeting {
   tabId: number;
   url: string;
   startTime: string;
   endTime?: string;
+  title: string;
   participants?: string[];
 }
 
@@ -56,9 +63,14 @@ export function handleUrlChange(tabId: number, url: string) {
 }
 
 export function startMeeting(tabId: number, url: string) {
+  const meetingIdPattern = /meet\.google\.com\/([^?]+)/;
+  const match = url.match(meetingIdPattern);
+  const meetingId = match ? match[1] : "";
+
   currentMeetings[tabId] = {
     tabId,
     url,
+    title: meetingId, // Set title as the meetingId initially
     startTime: new Date().toISOString(),
     participants: [],
   };
@@ -81,6 +93,7 @@ export function endMeeting(tabId: number) {
     if (meetingData[meeting.url]) {
       meetingData[meeting.url].push({
         duration,
+        title: meeting.title,
         startTime: meeting.startTime,
         endTime: meeting.endTime,
         participants: meeting.participants,
@@ -89,6 +102,7 @@ export function endMeeting(tabId: number) {
       meetingData[meeting.url] = [
         {
           duration,
+          title: meeting.title,
           startTime: meeting.startTime,
           endTime: meeting.endTime,
           participants: meeting.participants,
@@ -107,22 +121,41 @@ export function endMeeting(tabId: number) {
   delete currentMeetings[tabId];
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  const tabId = sender?.tab?.id;
-  const meeting = tabId && currentMeetings[tabId];
+chrome.runtime.onMessage.addListener(
+  (request: MessageData, sender, sendResponse) => {
+    const tabId = sender?.tab?.id;
+    const meeting = tabId && currentMeetings[tabId];
 
-  if (request.action === "getParticipants") {
     if (meeting) {
-      // Remove duplicates using Set and spread operator
-      meeting.participants = [
-        ...new Set([...(meeting.participants || []), ...request.source]),
-      ];
+      switch (request.action) {
+        case "getParticipants": {
+          // Remove duplicates using Set and spread operator
+          const requestAsParticipantMessage = request as ParticipantMessageData;
+          meeting.participants = [
+            ...new Set([
+              ...(meeting.participants || []),
+              ...requestAsParticipantMessage.participants,
+            ]),
+          ];
+          break;
+        }
+
+        case "updateTitle": {
+          const requestAsTitleMessage = request as TitleMessageData;
+          if (requestAsTitleMessage.title) {
+            meeting.title = requestAsTitleMessage.title;
+          }
+          break;
+        }
+
+        case "endMeeting": {
+          endMeeting(tabId);
+          break;
+        }
+
+        default:
+          break;
+      }
     }
   }
-
-  if (request.action === "endMeeting") {
-    if (meeting) {
-      endMeeting(tabId);
-    }
-  }
-});
+);

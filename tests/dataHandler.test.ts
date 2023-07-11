@@ -17,6 +17,7 @@ describe("dataHandler", () => {
         duration: 1234,
         startTime: "2023-01-01T00:00:00Z",
         endTime: "2023-01-01T00:20:34Z",
+        title: "test-title",
         participants: ["Participant 1", "Participant 2"],
       },
     ],
