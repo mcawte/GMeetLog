@@ -1,7 +1,7 @@
 {
-  "name": "gmeet-extension",
-  "version": "1.2.0",
-  "description": "",
+  "name": "gmeetlog",
+  "version": "1.3.0",
+  "description": "A Chrome extension that logs the details of your Google Meet meetings.",
   "scripts": {
     "test": "jest --config jest.config.ts",
     "build": "parcel build src/background.ts src/content.ts src/popup.ts --dist-dir dist",
