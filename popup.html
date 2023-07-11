@@ -5,15 +5,16 @@
       body {
         width: 300px;
         margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
+        padding: 5px;
+        color: #ba3b0a;
+        background-color: #ffffff;
       }
       #meetings {
         list-style-type: none;
         padding: 0;
       }
       .meeting {
-        border: 1px solid #ccc;
+        border: 1px solid #e8772e;
         margin-bottom: 10px;
         padding: 10px;
         border-radius: 5px;
@@ -21,15 +22,31 @@
       .meeting h2 {
         margin: 0;
         font-size: 14px;
+        color: #ba3b0a;
       }
       .meeting p {
         margin: 5px 0;
         font-size: 12px;
+        color: #ba3b0a;
+      }
+      #exportControls {
+        margin-bottom: 10px;
+      }
+      #exportButton {
+        background-color: #e8772e;
+        color: #ffffff;
+        border: none;
+        padding: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      #exportButton:hover {
+        background-color: #ba3b0a;
       }
     </style>
   </head>
   <body>
-    <h1>Meetings</h1>
+    <h1>GMeetLog</h1>
     <div id="exportControls">
       <label for="exportSelect">Data Format:</label>
       <select id="exportSelect">
