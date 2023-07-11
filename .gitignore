@@ -15,6 +15,9 @@
 .DS_Store
 Thumbs.db
 
+# Zips
+*.zip
+
 # Log files
 npm-debug.log*
 yarn-debug.log*
