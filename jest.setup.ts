@@ -1,4 +1,4 @@
-import chromeMock from "./__mocks__/chromeMocks";
+import chromeMock from "./mocks/chromeMocks";
 
 // Set up the global chrome mock
 (global as any).chrome = chromeMock;
