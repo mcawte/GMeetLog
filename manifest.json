@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Google Meet Tracker",
-  "version": "1.2",
-  "description": "A Chrome extension that tracks the duration of your Google Meet meetings.",
+  "name": "GMeetLog",
+  "version": "1.3",
+  "description": "A Chrome extension that logs the details of your Google Meet meetings.",
   "icons": {
     "16": "images/favicon-16x16.png",
     "48": "images/favicon-32x32.png",
