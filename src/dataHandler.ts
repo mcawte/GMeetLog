@@ -2,6 +2,7 @@ import { displayData } from "./uiHandler";
 import { convertDataToCSV, convertDataToJSON } from "./utilities";
 
 export interface MeetingDetails {
+  title: string;
   duration: number;
   startTime: string;
   endTime: string;

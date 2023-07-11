@@ -1,3 +1,4 @@
+import { callOnMessageListeners } from "../mocks/chromeMocks";
 import {
   startMeeting,
   endMeeting,
@@ -17,7 +18,7 @@ describe("background.ts", () => {
 
   test("startMeeting should add a meeting to currentMeetings", () => {
     const tabId = 1;
-    const url = "https://meet.google.com/abc-def-ghi";
+    const url = "https://meet.google.com/abc-def-ghi?param=test";
 
     startMeeting(tabId, url);
 
@@ -122,5 +123,40 @@ describe("background.ts", () => {
     const meeting2 = currentMeetings[tabId2];
     expect(meeting1).toBeUndefined(); // The first meeting should have ended
     expect(meeting2).toBeDefined(); // The second meeting should still be ongoing
+  });
+
+  test("startMeeting should add a meeting with title as the meeting ID if no title is provided", () => {
+    const tabId = 1;
+    const url = "https://meet.google.com/abc-def-ghi";
+
+    startMeeting(tabId, url);
+
+    const meeting = currentMeetings[tabId];
+    expect(meeting).toBeDefined();
+    expect(meeting.url).toBe(url);
+    expect(meeting.title).toBe("abc-def-ghi");
+    expect(meeting.participants).toEqual([]);
+    expect(meeting.startTime).toBeDefined();
+  });
+
+  test("handle message with title", () => {
+    // Set the initial state
+    const tabId = 1;
+    const url = "https://meet.google.com/abc-def-ghi";
+    startMeeting(tabId, url);
+
+    // Mimic a message being sent
+    const newTitle = "New Title";
+    callOnMessageListeners(
+      {
+        action: "updateTitle",
+        title: newTitle,
+      },
+      { tab: { id: tabId } }
+    );
+
+    // Check if the title was updated
+    expect(currentMeetings[tabId]).toBeDefined();
+    expect(currentMeetings[tabId]?.title).toBe(newTitle);
   });
 });

@@ -1,7 +1,19 @@
-interface MessageData {
-  action: string;
-  source: string[];
+interface BaseMessageData {
+  action: "getParticipants" | "updateTitle" | "endMeeting";
 }
+
+export interface ParticipantMessageData extends BaseMessageData {
+  participants: string[];
+}
+
+export interface TitleMessageData extends BaseMessageData {
+  title: string;
+}
+
+export type MessageData =
+  | ParticipantMessageData
+  | TitleMessageData
+  | BaseMessageData;
 
 interface ParticipantElement extends Element {
   innerText: string;
@@ -29,7 +41,10 @@ if (match) {
           participantNameSelector
         ),
       ].map((e) => e.innerText);
-      const message: MessageData = { action: "getParticipants", source: names };
+      const message: ParticipantMessageData = {
+        action: "getParticipants",
+        participants: names,
+      };
 
       // Send the names to the background script
       chrome.runtime.sendMessage(message);
@@ -80,7 +95,41 @@ if (match) {
     });
   }
 
-  // Call getParticipants and monitorEndOfMeeting when the page loads
+  function monitorMeetingTitle() {
+    const observer = new MutationObserver((mutationsList, observer) => {
+      for (let mutation of mutationsList) {
+        if (mutation.type === "attributes") {
+          const target = mutation.target as HTMLElement;
+          const meetingTitle = target.getAttribute("data-meeting-title");
+
+          if (meetingTitle) {
+            const message: TitleMessageData = {
+              action: "updateTitle",
+              title: meetingTitle,
+            };
+
+            // Send the title to the background script
+            chrome.runtime.sendMessage(message);
+
+            // Once the title is found, disconnect the observer
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+
+    // Start observing the document with the configured parameters.
+    observer.observe(document, {
+      attributes: true, // Watch for attribute changes this time
+      attributeFilter: ["data-meeting-title"], // Specifically watch for changes in data-meeting-title attribute
+      childList: false,
+      subtree: true,
+    });
+  }
+
+  // Call getParticipants, monitorEndOfMeeting and monitorMeetingTitle when the page loads
   getParticipants();
   monitorEndOfMeeting();
+  monitorMeetingTitle();
 }

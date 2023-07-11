@@ -7,7 +7,7 @@ export function createListItem(url: string, meeting: MeetingDetails) {
   listItem.className = "meeting";
 
   const title = document.createElement("h2");
-  title.textContent = url;
+  title.textContent = meeting.title;
   listItem.appendChild(title);
 
   const duration = document.createElement("p");
