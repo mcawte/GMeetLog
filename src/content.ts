@@ -22,6 +22,10 @@ interface ParticipantElement extends Element {
 // Ensure the script only runs on a Google Meet call page
 const match = window.location.pathname.match(/\/([a-z]{3}-[a-z]{4}-[a-z]{3})/);
 if (match) {
+  /**
+   * Extract participant names from the Meet interface and
+   * send them to the background script.
+   */
   function getParticipants() {
     // This method is based on the Google Meet UI as of the last update of this code.
     // Changes to the Google Meet UI might break this method.
@@ -58,6 +62,10 @@ if (match) {
     });
   }
 
+  /**
+   * Monitor the Meet interface for a message indicating the user left the meeting,
+   * and then notify the background script.
+   */
   function monitorEndOfMeeting() {
     const observer = new MutationObserver((mutationsList) => {
       // Loop over each mutation that just occured
@@ -95,37 +103,78 @@ if (match) {
     });
   }
 
+  /**
+   * Monitor the Meet interface for changes to the meeting title,
+   * and then send the updated title to the background script.
+   */
   function monitorMeetingTitle() {
-    const observer = new MutationObserver((mutationsList, observer) => {
-      for (let mutation of mutationsList) {
-        if (mutation.type === "attributes") {
-          const target = mutation.target as HTMLElement;
-          const meetingTitle = target.getAttribute("data-meeting-title");
-
-          if (meetingTitle) {
-            const message: TitleMessageData = {
-              action: "updateTitle",
-              title: meetingTitle,
-            };
-
-            // Send the title to the background script
-            chrome.runtime.sendMessage(message);
-
-            // Once the title is found, disconnect the observer
-            observer.disconnect();
-            return;
+    const observerForTitleByDataMeetingTitleTag = new MutationObserver(
+      (mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+          if (mutation.type === "attributes") {
+            const target = mutation.target as HTMLElement;
+            const meetingTitle = target.getAttribute("data-meeting-title");
+            if (meetingTitle) {
+              // Send the title to the background script
+              sendUpdateTitleMessage(meetingTitle);
+              // Once the title is found, disconnect the observer
+              observer.disconnect();
+              return;
+            }
           }
         }
       }
-    });
+    );
 
-    // Start observing the document with the configured parameters.
-    observer.observe(document, {
+    const observerForTitleByCssClass = new MutationObserver(
+      (mutationsList, observer) => {
+        for (let mutation of mutationsList) {
+          if (mutation.type === "childList") {
+            // Check for specific class name. This could change in future
+            const elementOfInterest = document.querySelector(".u6vdEc.ouH3xe");
+
+            // This class name is used to say "Meeting details" down the bottom
+            // left of the screen at the start. The entire dom is replaced so we have
+            // to go through the tree otherwise we won't see the change
+            if (
+              elementOfInterest?.textContent &&
+              elementOfInterest.textContent != "Meeting details"
+            ) {
+              // Send the title to the background script
+              sendUpdateTitleMessage(elementOfInterest.textContent);
+              // Once the title is found, disconnect both observers
+              observer.disconnect();
+              observerForTitleByDataMeetingTitleTag.disconnect();
+              return;
+            }
+          }
+        }
+      }
+    );
+
+    // Monitor changes in data-meeting-title attribute across the document.
+    observerForTitleByDataMeetingTitleTag.observe(document, {
       attributes: true, // Watch for attribute changes this time
       attributeFilter: ["data-meeting-title"], // Specifically watch for changes in data-meeting-title attribute
       childList: false,
       subtree: true,
     });
+
+    // Monitor changes in class attribute across the document.
+    observerForTitleByCssClass.observe(document, {
+      attributes: true,
+      attributeFilter: ["class"],
+      childList: true,
+      subtree: true,
+    });
+
+    function sendUpdateTitleMessage(meetingTitle: string) {
+      const message = {
+        action: "updateTitle",
+        title: meetingTitle,
+      };
+      chrome.runtime.sendMessage(message);
+    }
   }
 
   // Call getParticipants, monitorEndOfMeeting and monitorMeetingTitle when the page loads

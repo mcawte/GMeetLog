@@ -20,6 +20,21 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     handleUrlChange(tabId, changeInfo.url);
   }
+  // Check if the tab's title has changed
+  if (changeInfo.title && currentMeetings[tabId]) {
+    const newTitle = changeInfo.title;
+    if (newTitle.startsWith("Meet - ")) {
+      const title = newTitle.substring("Meet - ".length);
+
+      // Update the title if it does not match the current meeting title and doesn't include the meeting URL params
+      if (
+        title !== currentMeetings[tabId].title &&
+        !title.includes(currentMeetings[tabId].title)
+      ) {
+        currentMeetings[tabId].title = title;
+      }
+    }
+  }
 });
 
 // Listen for tab closures
@@ -142,7 +157,11 @@ chrome.runtime.onMessage.addListener(
 
         case "updateTitle": {
           const requestAsTitleMessage = request as TitleMessageData;
-          if (requestAsTitleMessage.title) {
+          // check if title isn't just query params
+          if (
+            requestAsTitleMessage.title &&
+            !requestAsTitleMessage.title.includes(meeting.title)
+          ) {
             meeting.title = requestAsTitleMessage.title;
           }
           break;
